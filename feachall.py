@@ -2,6 +2,7 @@ from selenium import webdriver
 from bs4 import BeautifulSoup
 import requests
 import json
+from selenium.webdriver.common.keys import Keys
 
 def chrome():
     try:
@@ -16,46 +17,46 @@ def chrome():
         datum = []
         matrix = []
         key = {}
-        # for div in soup.select('div.type02_m035 ul li.item'):
-        #     # print(div.text)
-        #     # count += 1
-        #     if count > 9:
-        #         break
-        #     else:
-        #         datum.append(div.text.split('\n'))
-        #         # print(div.text)
-        #         count += 1
-        # datum.remove('')
-        '''抓取 top100 資料'''
+        for div in soup.select('div.type02_m035 ul li.item'):
+            # print(div.text)
+            # count += 1
+            # if count > 9:
+            #     break
+            # else:
+            datum.append(div.text.split('\n'))
+                #print(div.text)
+                #count += 1
+
+        '''發生error-('Connection aborted.', OSError("(10054, 'WSAECONNRESET')"))'''
+
         for div2 in soup.select('div.type02_bd-a h4 a'):
             matrix.append(div2.get('href'))
             print('title',div2.text)
             print('href',div2['href'])
-        print(matrix)
+        #print(matrix)
+        headers = {
+            "Host": "www.books.com.tw",
+            'User-Agent': 'Mozilla/5.0(Windows NT 10.0;Win64;x64) AppleWebKit/537.36(KHTML, like Gecko) Chrome/78.0.3904.87 Safari/537.36'}
         for a in matrix:
-            r = requests.get(a)
-            test = soup.select('div.title h3 a')
-            for b in test:
+            #print(a)
+            r = requests.get(a,headers = headers)
+            #print(r.request.headers)
+            #print(r.text)
+            for b in soup.select('div.cnt_prod002.clearfix ul.price'):
                 print('分類',b.text)
 
-            #for classfy in soup.select('div.grid_10 li'):
-                #print('細項',classfy.text)
+            ###error - ('Connection aborted.', OSError("(10054, 'WSAECONNRESET')"))
 
+        ####json格式輸出
+        for data in datum:
+            while '' in data:
+                data.remove('')
 
+            dict = {}
+            dict['key'] = {"'" + data[0] +"'": data}
+            json1 = json.dumps(dict['key'], ensure_ascii=False).encode('utf8')
+            print(json1.decode())
 
-        # for data in datum:
-        #     while '' in data:
-        #         data.remove('')
-        # if data =='TOP1':
-        # dict = {}
-        # dict['key'] = {"'" + data[0] +"'": data}
-        # json1 = json.dumps(dict['key'], ensure_ascii=False).encode('utf8')
-        # print(json1.decode())
-        # print(datum)
-        # key = {'fp':234,'a':True,'b':False,'c':None,'d':123}
-        # testkey = {'aa':datum}
-        # json1 = json.dumps(key)
-        # print(json1)
     except Exception as e:
         print(e)
 
